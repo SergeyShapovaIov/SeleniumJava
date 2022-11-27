@@ -10,8 +10,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class WebDnsPageTest {
 
@@ -21,7 +23,7 @@ public class WebDnsPageTest {
 
     // Считывание входных параметров
     String browserEnv = System.getProperty("browser", "chrome");
-    String loadStrategyEnv = System.getProperty("loadstrategy", "normal");
+    String loadStrategyEnv = System.getProperty("loadstrategy", "eager");
 
 
     @BeforeEach
@@ -31,6 +33,7 @@ public class WebDnsPageTest {
         logger.info("loadStrategyEnv = " + loadStrategyEnv);
 
         driver = WebDriverFactory.getDriver(browserEnv.toLowerCase(), loadStrategyEnv);
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(20));
         logger.info("Драйвер стартовал!");
     }
 
@@ -164,40 +167,36 @@ public class WebDnsPageTest {
         }
 
         try {
-            String xpathFoodPreparationLink = ".//a[text()=\"Приготовление пищи\"]";
-            WebElement elementFoodPreparationLink = driver.findElement(By.xpath(xpathFoodPreparationLink));
-            actions.moveToElement(elementFoodPreparationLink).perform();
-        } catch (NoSuchElementException e) {
-            logger.error("Не найдена ссылка 'Приготовление пищи'");
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        String xpathCookedFoodComponentLink = ".//a[text()=\"Приготовление пищи\"]/descendant::a[@class='ui-link menu-desktop__popup-link']";
-        List<WebElement> elementsLinks = driver.findElements(By.xpath(xpathCookedFoodComponentLink));
-        Assertions.assertTrue(elementsLinks.size() > 5, "В подменю 'Приготовление пищи' ссылок не больше 5");
-
-        try {
-            String xpathPlatesLink = ".//a[text()=\"Приготовление пищи\"]/descendant::a[text()=\"Плиты\"]";
-            WebElement elementPlatesLink = driver.findElement(By.xpath(xpathPlatesLink));
-            actions.moveToElement(elementPlatesLink).perform();
-            elementPlatesLink.click();
-        } catch (NoSuchElementException e) {
-            logger.error("Не найдена ссылка 'Плиты'");
-        }
-
-        try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         try {
-            String xpathElectricStovesLink = ".//a[label[text() = \"Плиты электрические\"]]";
+            String xpathStovesAndOvensLink = ".//a[text() = \"Плиты и печи\"]";
+            WebElement elementStovesAndOvensLink = driver.findElement(By.xpath(xpathStovesAndOvensLink));
+            actions.moveToElement(elementStovesAndOvensLink).perform();
+        } catch (NoSuchElementException e) {
+            logger.error("Не найдена ссылка 'Плиты и плечи'");
+        }
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try{
+            String xpathStovesAndOvensItemsLinks = ".//a[text() = \"Плиты и печи\"]/descendant::a[@class='ui-link menu-desktop__popup-link']";
+            List<WebElement> elementsLinks = driver.findElements(By.xpath(xpathStovesAndOvensItemsLinks));
+            Assertions.assertTrue(elementsLinks.size() > 5, "В подменю 'Плиты и печи' ссылок не больше 5");
+        } catch (NoSuchElementException e) {
+            logger.error("Не найдены ссылки в подменю 'Плиты и печи'");
+        }
+
+
+        try {
+            String xpathElectricStovesLink = ".//a[text() = \"Плиты электрические\"]";
             WebElement elementElectricStovesLink = driver.findElement(By.xpath(xpathElectricStovesLink));
             elementElectricStovesLink.click();
         } catch (NoSuchElementException e) {
@@ -226,6 +225,7 @@ public class WebDnsPageTest {
             logger.info("Драйвер остановлен!");
         }
     }
+
     public void selectSuggestedLocation (WebDriver driver){
         String xpathCityButton = ".//button[contains(@class,' base-ui-button-v2 v-confirm-city__btn')]";
         try{

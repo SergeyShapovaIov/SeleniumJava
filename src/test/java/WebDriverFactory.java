@@ -22,22 +22,10 @@ public class WebDriverFactory {
                 logger.info("Драйвер для браузера Google Chrome");
 
                 ChromeOptions chromeOptions = new ChromeOptions();
-                chromeOptions.addArguments("--start-maximized");
+                chromeOptions.addArguments("--start-fullscreen");
                 chromeOptions.addArguments("--incognito");
 
-                switch (loadStrategyName){
-                    case "normal" :
-                        chromeOptions.setCapability("pageLoadStrategy", PageLoadStrategy.NORMAL);
-                        break;
-                    case "eager" :
-                        chromeOptions.setCapability("pageLoadStrategy", PageLoadStrategy.EAGER);
-                        break;
-                    case "none" :
-                        chromeOptions.setCapability("pageLoadStrategy", PageLoadStrategy.NONE);
-                        break;
-                    default:
-                        throw new RuntimeException("Стратегия загрузки задана не корректно");
-                }
+                chromeOptions.setPageLoadStrategy(PageLoadStrategy.valueOf(loadStrategyName.toUpperCase()));
 
                 return new ChromeDriver(chromeOptions);
             // Создание драйвера для браузера Mozilla Firefox
@@ -46,22 +34,11 @@ public class WebDriverFactory {
                 logger.info("Драйвер для браузера Mozilla Firefox");
 
                 FirefoxOptions firefoxOptions = new FirefoxOptions();
-                firefoxOptions.addArguments("--start-maximized");
-                firefoxOptions.addArguments("--incognito");
+                firefoxOptions.addArguments("--kiosk");
+                firefoxOptions.addArguments("--private");
 
-                switch (loadStrategyName){
-                    case "normal" :
-                        firefoxOptions.setCapability("pageLoadStrategy", PageLoadStrategy.NORMAL);
-                        break;
-                    case "eager" :
-                        firefoxOptions.setCapability("pageLoadStrategy", PageLoadStrategy.EAGER);
-                        break;
-                    case "none" :
-                        firefoxOptions.setCapability("pageLoadStrategy", PageLoadStrategy.NONE);
-                        break;
-                    default:
-                        throw new RuntimeException("Стратегия загрузки задана не корректно");
-                }
+                firefoxOptions.setPageLoadStrategy(PageLoadStrategy.valueOf(loadStrategyName.toUpperCase()));
+
 
                 return new FirefoxDriver(firefoxOptions);
             // Ответ по умолчанию, если введено некорректное название браузера
